@@ -72,19 +72,13 @@ const create = async ({ channelId, optionsString }) => {
   if (parsedResults.error) {
     return safeReturn(parsedResults.error)
   }
+
   const { title, options } = parsedResults.results
 
   const poll = {
     channelId,
     title,
     options: _createOptionsObject({ options }),
-  }
-
-  const saveResult = await pollData.savePoll({ channelId, data: poll })
-
-  if (saveResult.error) {
-    console.log(saveResult.error)
-    return safeReturn(new Error('Something went wrong saving poll'))
   }
 
   return safeReturn(null, poll)

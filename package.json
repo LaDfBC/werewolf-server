@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/jdpipkin/werewolf-server#readme",
   "dependencies": {
+    "axios": "^0.19.2",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "ioredis": "^4.14.1",

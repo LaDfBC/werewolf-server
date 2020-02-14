@@ -7,6 +7,7 @@ const polls = require('./src/polls')
 const slackResponses = require('./src/slackResponses')
 const validateRequest = require('./src/validateRequest')
 const votes = require('./src/votes')
+const commandHandler = require('./src/commandHandler')
 
 // Store our app's ID and Secret. These we got from Step 1.
 // For this tutorial, we'll keep your API credentials right here. But for an actual app, you'll want to  store them securely in environment variables.
@@ -73,6 +74,7 @@ app.get('/oauth', (req, res) => {
 
 // Route the endpoint that our slash command will point to and send back a simple response to indicate that ngrok is working
 app.post('/werewolf', validateRequest, async (req, res) => {
+  console.log(req.body)
   const { user_id: userId, channel_id: channelId, text } = req.body
 
   const splitText = text.split(' ')
@@ -83,21 +85,22 @@ app.post('/werewolf', validateRequest, async (req, res) => {
   let result = {}
   switch (command.toLowerCase()) {
     case 'poll':
-      result = await polls.create({ channelId, optionsString })
+      // result = await polls.create({ channelId, optionsString })
 
-      message = result.error
-        ? slackResponses.errorResponse({ error: result.error })
-        : slackResponses.publicResponse({
-            blocks: polls.formatPollDisplay({ poll: result.results }),
-          })
-      // create poll in channel
-      break
+      // message = result.error
+      //   ? slackResponses.errorResponse({ error: result.error })
+      //   : slackResponses.publicResponse({
+      //       blocks: polls.formatPollDisplay({ poll: result.results }),
+      //     })
+      // // create poll in channel
+      commandHandler.poll({ channelId, optionsString, userId })
+      return res.status(200).send()
     case 'results':
       result = await polls.find({ channelId })
       message = result.error
         ? slackResponses.errorResponse({ error: result.error })
         : slackResponses.privateResponse({
-            blocks: polls.formatPollDisplay({ poll: result.results }),
+            blocks: polls.formatPollDisplay({ poll: result.results.poll }),
           })
       // format results and return
       break
@@ -123,7 +126,7 @@ app.post('/werewolf', validateRequest, async (req, res) => {
       message = result.error
         ? slackResponses.errorResponse({ error: result.error })
         : slackResponses.publicResponse({
-            blocks: polls.formatPollDisplay({ poll: result.results }),
+            blocks: polls.formatPollDisplay({ poll: result.results.poll }),
           })
       // delete poll
       break
@@ -131,5 +134,6 @@ app.post('/werewolf', validateRequest, async (req, res) => {
       message = slackResponses.errorResponse(new Error('Unknown command'))
   }
 
+  console.log(message)
   if (message) return res.status(200).json(message)
 })

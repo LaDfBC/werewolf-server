@@ -80,10 +80,6 @@ describe('createPoll', () => {
         Promise.resolve({ error: 'Mock Error', results: null })
       )
 
-    jest
-      .spyOn(pollData, 'savePoll')
-      .mockImplementation(() => Promise.resolve({ error: null, results: true }))
-
     const optionsString = '“Test Poll” Option 1, Option 2'
 
     // act
@@ -143,31 +139,5 @@ describe('createPoll', () => {
     expect(actual.error.message).toBe(
       'Poll not properly formatted. Please used "Poll Title Text" Option 1, Option 2...'
     )
-  })
-
-  it('should return an error if save fails', async () => {
-    // arrange
-    const optionsString = '“Test Poll” Option 1, Option 2'
-
-    jest
-      .spyOn(pollData, 'findPoll')
-      .mockImplementation(() =>
-        Promise.resolve({ error: 'Mock Error', results: null })
-      )
-
-    jest
-      .spyOn(pollData, 'savePoll')
-      .mockImplementation(() =>
-        Promise.resolve({ error: 'Some Error', results: true })
-      )
-
-    // act
-    const actual = await poll.create({
-      channelId: '12345',
-      optionsString,
-    })
-
-    // assert
-    expect(actual.error.message).toBe('Something went wrong saving poll')
   })
 })

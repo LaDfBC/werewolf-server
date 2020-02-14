@@ -36,7 +36,8 @@ const vote = async ({ channelId, userId, optionsString }) => {
   if (optionsString === '') {
     return safeReturn(new Error('Please provide a vote option'), null)
   }
-  const currentPoll = pollResults.results
+  const { ts, poll: currentPoll } = pollResults.results
+
   const newPoll = Object.assign(
     {},
     {
@@ -49,7 +50,7 @@ const vote = async ({ channelId, userId, optionsString }) => {
     }
   )
 
-  const saveResult = await pollsData.savePoll({ channelId, data: newPoll })
+  const saveResult = await pollsData.savePoll({ channelId, data: newPoll, ts })
 
   if (saveResult.error) {
     return saveResult
